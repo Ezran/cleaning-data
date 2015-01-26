@@ -1,9 +1,9 @@
-if (!file.exists("data.zip")){
+if (!file.exists("data.zip") && !file.exists("UCI HAR Dataset"){
 	download.file("https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip","data.zip",method="curl")
 	dateDownloaded <- date()
-} else message("zip file exists, skipping download...")
+} else message("data exists, skipping download...")
 
-unzip("data.zip", overwrite = FALSE)
+if (!file.exists("UCI HAR Dataset")) unzip("data.zip", overwrite = FALSE)
 base_wd <- getwd()
 
 #get the labels from features / activity labels
@@ -30,12 +30,15 @@ mean_std <- c(mean_std, 562, 563)
 data <- data[,mean_std]
 
 #replace activity int with string (does not work?)
-for (i in 1:nrow(activity_labels)) {
-	data$'Activity Type'[data$'Activity Type' == i] <- activity_labels[i,2]
-}
+
 
 #average rows
-avg <- colMeans(data[1:79,])
+avg <- colMeans(data[,1:79])
 
 #reset working directory
 setwd(base_wd)
+
+#write averages out
+write.table(avg,"avg.txt",row.name=FALSE)
+
+return(avg)
